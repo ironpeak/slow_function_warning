@@ -3,12 +3,14 @@ extern crate proc_macro;
 use std::time::Duration;
 
 use proc_macro::TokenStream;
+use proc_macro2::Span;
 use quote::{quote, ToTokens};
 use syn::{
     parse::{Parse, ParseStream},
     parse_macro_input,
     punctuated::Punctuated,
-    Expr, Item, Result, Stmt, Token,
+    token::Semi,
+    Expr, Item, Lit, LitStr, Result, Stmt, Token,
 };
 
 struct Args {
@@ -51,9 +53,14 @@ impl Parse for Args {
             }
         };
         let stmt = if punctuated.len() >= 2 {
-            syn::parse(punctuated.pop().unwrap().to_token_stream().into())?
+            let expr: Expr = syn::parse(punctuated.pop().unwrap().to_token_stream().into())?;
+            Stmt::Expr(expr, Some(Semi::default()))
         } else {
-            syn::parse(quote! { println!("Hello"); }.into())?
+            syn::parse(
+                quote! {
+                println!("Warning: {module}::{function}: ran for {millis}ms"); }
+                .into(),
+            )?
         };
         Ok(Args { time, stmt })
     }
@@ -84,6 +91,10 @@ pub fn slow_function_warning(args: TokenStream, input: TokenStream) -> TokenStre
 
     let stmt = args.stmt;
     let nano_seconds = args.time.as_nanos();
+    let function_name = Lit::Str(LitStr::new(
+        &function.sig.ident.to_string(),
+        Span::call_site(),
+    ));
 
     let mut stmts = vec![
         syn::parse(
@@ -100,6 +111,15 @@ pub fn slow_function_warning(args: TokenStream, input: TokenStream) -> TokenStre
                 impl Drop for SlowFunctionWarning {
                     fn drop(&mut self) {
                         if self.start.elapsed().as_nanos() > #nano_seconds {
+                            let module = module_path!();
+                            let function = #function_name;
+                            let elapsed = self.start.elapsed();
+                            let ns = elapsed.as_nanos();
+                            let nanos = ns;
+                            let ms = elapsed.as_millis();
+                            let millis = ms;
+                            let s = elapsed.as_secs();
+                            let secs = s;
                             #stmt;
                         }
                     }
