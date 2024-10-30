@@ -9,4 +9,10 @@ proc-macro = true
 [dependencies]
 proc-macro2 = "1"
 quote = "1"
-syn = "2"
+syn = { version = "2", features = ["full"] }
+
+[dev-dependencies]
+syn = { version = "2", features = ["full", "extra-traits"] }
+
+[[test]]
+name = "debug_slow_function_warning"
