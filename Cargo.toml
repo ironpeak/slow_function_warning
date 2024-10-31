@@ -10,6 +10,10 @@ keywords = ["macro", "metrics", "instrument"]
 categories = ["development-tools::profiling"]
 license = "MIT"
 
+[features]
+default = []
+bevy = []
+
 [lib]
 proc-macro = true
 
