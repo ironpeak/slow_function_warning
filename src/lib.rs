@@ -117,7 +117,7 @@ pub fn slow_system_warning(args: TokenStream, input: TokenStream) -> TokenStream
     let time = if let Some(time_expr) = args.get(0) {
         parse_time(time_expr).unwrap()
     } else {
-        Duration::from_millis(1);
+        Duration::from_millis(1)
     };
     let stmt = if let Some(stmt) = args.get(1) {
         Stmt::Expr(stmt.clone(), Some(Semi::default()))
