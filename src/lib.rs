@@ -145,6 +145,7 @@ fn slow_function_warning_common(time: Duration, stmt: Stmt, mut function: ItemFn
             quote! {
                 struct SlowFunctionWarning {
                     start: std::time::Instant,
+                    closure: Box<dyn std::ops::FnMut(std::time::Instant)>,
                 }
             }
             .into(),
@@ -154,18 +155,7 @@ fn slow_function_warning_common(time: Duration, stmt: Stmt, mut function: ItemFn
             quote! {
                 impl Drop for SlowFunctionWarning {
                     fn drop(&mut self) {
-                        if self.start.elapsed().as_nanos() > #nano_seconds {
-                            let module = module_path!();
-                            let function = #function_name;
-                            let elapsed = self.start.elapsed();
-                            let ns = elapsed.as_nanos();
-                            let nanos = ns;
-                            let ms = elapsed.as_millis();
-                            let millis = ms;
-                            let s = elapsed.as_secs();
-                            let secs = s;
-                            #stmt;
-                        }
+                        (self.closure)(self.start);
                     }
                 }
             }
@@ -176,6 +166,20 @@ fn slow_function_warning_common(time: Duration, stmt: Stmt, mut function: ItemFn
             quote! {
                 let _slow_function_warning = SlowFunctionWarning {
                     start: std::time::Instant::now(),
+                    closure: Box::new(move |start| {
+                        if start.elapsed().as_nanos() > #nano_seconds {
+                            let module = module_path!();
+                            let function = #function_name;
+                            let elapsed = start.elapsed();
+                            let ns = elapsed.as_nanos();
+                            let nanos = ns;
+                            let ms = elapsed.as_millis();
+                            let millis = ms;
+                            let s = elapsed.as_secs();
+                            let secs = s;
+                            #stmt;
+                        }
+                    }),
                 };
             }
             .into(),
