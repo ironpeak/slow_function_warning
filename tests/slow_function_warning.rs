@@ -40,25 +40,29 @@ fn no_warn() {
 
 #[test]
 fn warn_using_params() {
-    #[slow_function_warning(10ms, write_to_file("./slow_function_warning_warn.txt", &format!("{module}::{function} {param}")))]
+    #[allow(unused_variables)]
+    #[slow_function_warning(10ms, write_to_file("./slow_function_warning_warn_using_params.txt", &format!("{module}::{function} {param}")))]
     pub fn sleep(millis: u64, param: &str) {
         thread::sleep(Duration::from_millis(millis));
     }
     sleep(10, "trace id");
 
     assert_eq!(
-        read_from_file("./slow_function_warning_warn.txt"),
-        "slow_function_warning::sleep"
+        read_from_file("./slow_function_warning_warn_using_params.txt"),
+        "slow_function_warning::sleep trace id"
     );
 }
 
 #[test]
 fn no_warn_using_params() {
-    #[slow_function_warning(10ms, write_to_file("./slow_function_warning_no_warn.txt", &format!("{module}::{function} {param}")))]
+    #[allow(unused_variables)]
+    #[slow_function_warning(10ms, write_to_file("./slow_function_warning_no_warn_using_params.txt", &format!("{module}::{function} {param}")))]
     pub fn sleep(millis: u64, param: &str) {
         thread::sleep(Duration::from_millis(millis));
     }
     sleep(1, "trace id");
 
-    assert!(!file_exists("./slow_function_warning_no_warn.txt"));
+    assert!(!file_exists(
+        "./slow_function_warning_no_warn_using_params.txt"
+    ));
 }
