@@ -6,8 +6,8 @@ use proc_macro::TokenStream;
 use proc_macro2::Span;
 use quote::{quote, ToTokens};
 use syn::{
-    parse_macro_input, punctuated::Punctuated, spanned::Spanned, token::Semi, Expr, Item, ItemFn,
-    Lit, LitStr, Result, Stmt, Token,
+    parse_macro_input, punctuated::Punctuated, spanned::Spanned, token::Semi, Block, Expr, Ident,
+    Item, ItemFn, Lit, LitStr, Result, Stmt, Token,
 };
 
 fn parse_time(expr: &Expr) -> Result<Duration> {
@@ -133,19 +133,64 @@ pub fn slow_system_warning(args: TokenStream, input: TokenStream) -> TokenStream
     slow_function_warning_common(time, stmt, function)
 }
 
-fn slow_function_warning_common(time: Duration, stmt: Stmt, mut function: ItemFn) -> TokenStream {
+fn slow_function_warning_common(time: Duration, stmt: Stmt, function: ItemFn) -> TokenStream {
     let nano_seconds = time.as_nanos();
+    let function_name_ident = function.sig.ident.clone();
     let function_name = Lit::Str(LitStr::new(
-        &function.sig.ident.to_string(),
+        &function_name_ident.to_string(),
         Span::call_site(),
     ));
+    let function_params: Vec<_> = function
+        .sig
+        .inputs
+        .iter()
+        .map(|arg| match arg {
+            syn::FnArg::Receiver(_) => Ident::new("self", Span::call_site()),
+            syn::FnArg::Typed(typed) => match &*typed.pat {
+                syn::Pat::Ident(ident) => ident.ident.clone(),
+                _ => unreachable!(),
+            },
+        })
+        .collect();
 
-    let mut stmts = vec![
+    let mut result = ItemFn {
+        attrs: function.attrs.clone(),
+        vis: function.vis.clone(),
+        sig: function.sig.clone(),
+        block: Box::new(Block {
+            brace_token: function.block.brace_token.clone(),
+            stmts: vec![Stmt::Item(Item::Fn(function))],
+        }),
+    };
+
+    result.block.stmts.extend_from_slice(&[
         syn::parse(
             quote! {
-                struct SlowFunctionWarning {
-                    start: std::time::Instant,
-                    closure: Box<dyn std::ops::FnMut(std::time::Instant)>,
+                let start = std::time::Instant::now();
+            }
+            .into(),
+        )
+        .unwrap(),
+        syn::parse(
+            quote! {
+                let result = #function_name_ident(#(#function_params),*);
+            }
+            .into(),
+        )
+        .unwrap(),
+        syn::parse(
+            quote! {
+                if start.elapsed().as_nanos() > #nano_seconds {
+                    let module = module_path!();
+                    let function = #function_name;
+                    let elapsed = start.elapsed();
+                    let ns = elapsed.as_nanos();
+                    let nanos = ns;
+                    let ms = elapsed.as_millis();
+                    let millis = ms;
+                    let s = elapsed.as_secs();
+                    let secs = s;
+                    #stmt;
                 }
             }
             .into(),
@@ -153,45 +198,12 @@ fn slow_function_warning_common(time: Duration, stmt: Stmt, mut function: ItemFn
         .unwrap(),
         syn::parse(
             quote! {
-                impl Drop for SlowFunctionWarning {
-                    fn drop(&mut self) {
-                        (self.closure)(self.start);
-                    }
-                }
+                return result;
             }
             .into(),
         )
         .unwrap(),
-        syn::parse(
-            quote! {
-                let _slow_function_warning = SlowFunctionWarning {
-                    start: std::time::Instant::now(),
-                    closure: Box::new(move |start| {
-                        if start.elapsed().as_nanos() > #nano_seconds {
-                            let module = module_path!();
-                            let function = #function_name;
-                            let elapsed = start.elapsed();
-                            let ns = elapsed.as_nanos();
-                            let nanos = ns;
-                            let ms = elapsed.as_millis();
-                            let millis = ms;
-                            let s = elapsed.as_secs();
-                            let secs = s;
-                            #stmt;
-                        }
-                    }),
-                };
-            }
-            .into(),
-        )
-        .unwrap(),
-    ];
-    function
-        .block
-        .stmts
-        .drain(..)
-        .for_each(|stmt| stmts.push(stmt));
-    function.block.stmts = stmts;
+    ]);
 
-    function.into_token_stream().into()
+    result.into_token_stream().into()
 }

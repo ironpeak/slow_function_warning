@@ -20,7 +20,7 @@ proc-macro = true
 [dependencies]
 proc-macro2 = "1"
 quote = "1"
-syn = { version = "2", features = ["full"] }
+syn = { version = "2", features = ["full", "clone-impls", "extra-traits"] }
 
 [[test]]
 name = "slow_function_warning"
