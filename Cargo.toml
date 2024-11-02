@@ -12,7 +12,6 @@ license = "MIT"
 
 [features]
 default = []
-bevy = []
 
 [lib]
 proc-macro = true
@@ -22,9 +21,8 @@ proc-macro2 = "1"
 quote = "1"
 syn = { version = "2", features = ["full", "clone-impls", "extra-traits"] }
 
-[[test]]
-name = "slow_function_warning"
+[dev-dependencies]
+tokio = { version = "1", features = ["macros", "rt", "time"] }
 
 [[test]]
-name = "slow_system_warning"
-features = ["bevy"]
+name = "slow_function_warning"
