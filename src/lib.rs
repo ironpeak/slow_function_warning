@@ -6,8 +6,12 @@ use proc_macro::TokenStream;
 use proc_macro2::Span;
 use quote::{quote, ToTokens};
 use syn::{
-    parse_macro_input, punctuated::Punctuated, spanned::Spanned, token::Semi, Block, Expr, Ident,
-    Item, ItemFn, Lit, LitStr, Result, Stmt, Token,
+    parse_macro_input,
+    punctuated::Punctuated,
+    spanned::Spanned,
+    token::{Colon, Semi},
+    Block, Expr, FnArg, Ident, Item, ItemFn, Lit, LitStr, Pat, PatIdent, PatType, Result, Stmt,
+    Token,
 };
 
 fn parse_time(expr: &Expr) -> Result<Duration> {
@@ -133,7 +137,7 @@ pub fn slow_system_warning(args: TokenStream, input: TokenStream) -> TokenStream
     slow_function_warning_common(time, stmt, function)
 }
 
-fn slow_function_warning_common(time: Duration, stmt: Stmt, function: ItemFn) -> TokenStream {
+fn slow_function_warning_common(time: Duration, stmt: Stmt, mut function: ItemFn) -> TokenStream {
     let nano_seconds = time.as_nanos();
     let function_name_ident = function.sig.ident.clone();
     let function_name = Lit::Str(LitStr::new(
@@ -159,11 +163,14 @@ fn slow_function_warning_common(time: Duration, stmt: Stmt, function: ItemFn) ->
         sig: function.sig.clone(),
         block: Box::new(Block {
             brace_token: function.block.brace_token.clone(),
-            stmts: vec![Stmt::Item(Item::Fn(function))],
+            stmts: vec![],
         }),
     };
 
-    result.block.stmts.extend_from_slice(&[
+    rename_function_self(&mut function, "_self_arg_renamed");
+
+    result.block.stmts = vec![
+        Stmt::Item(Item::Fn(function)),
         syn::parse(
             quote! {
                 let start = std::time::Instant::now();
@@ -203,7 +210,28 @@ fn slow_function_warning_common(time: Duration, stmt: Stmt, function: ItemFn) ->
             .into(),
         )
         .unwrap(),
-    ]);
+    ];
 
     result.into_token_stream().into()
+}
+
+fn rename_function_self(function: &mut ItemFn, ident: &str) {
+    let Some(FnArg::Receiver(receiver)) = function.sig.inputs.iter().next() else {
+        return;
+    };
+    println!("{}: {:?}", ident, receiver);
+    function.sig.inputs[0] = FnArg::Typed(PatType {
+        attrs: receiver.attrs.clone(),
+        pat: Box::new(Pat::Ident(PatIdent {
+            attrs: vec![],
+            by_ref: None,
+            mutability: None,
+            ident: Ident::new(ident, Span::call_site()),
+            subpat: None,
+        })),
+        colon_token: Colon {
+            spans: [Span::call_site()],
+        },
+        ty: receiver.ty.clone(),
+    });
 }

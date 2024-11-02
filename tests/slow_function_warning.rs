@@ -66,3 +66,25 @@ fn no_warn_using_params() {
         "./slow_function_warning_no_warn_using_params.txt"
     ));
 }
+
+#[test]
+fn warn_impl() {
+    struct MyStruct {
+        pub value: u64,
+    }
+
+    impl MyStruct {
+        #[slow_function_warning(10ms, write_to_file("./slow_function_warning_warn_impl.txt", &format!("{module}::{function} {param}")))]
+        pub fn sleep(&mut self, millis: u64, param: &str) {
+            thread::sleep(Duration::from_millis(millis));
+        }
+    }
+
+    let mut my_struct = MyStruct { value: 10 };
+    my_struct.sleep(10, "trace id");
+
+    assert_eq!(
+        read_from_file("./slow_function_warning_warn_impl.txt"),
+        "slow_function_warning::sleep trace id"
+    );
+}
