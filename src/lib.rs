@@ -110,7 +110,7 @@ fn slow_function_warning_common(time: Duration, stmt: Stmt, function: ItemFn) ->
     let closure_decleration: Stmt = if is_async {
         syn::parse(
             quote! {
-                let closure = move || async move {
+                let mut closure = move || async move {
                     #block
                 };
             }
@@ -120,7 +120,7 @@ fn slow_function_warning_common(time: Duration, stmt: Stmt, function: ItemFn) ->
     } else {
         syn::parse(
             quote! {
-                let closure = move || {
+                let mut closure = move || {
                     #block
                 };
             }
