@@ -1,6 +1,6 @@
 [package]
 name = "slow_function_warning"
-version = "0.2.1"
+version = "0.2.2"
 authors = ["Hrafn Orri Hrafnkelsson <hrafn@vidfjord.is>"]
 edition = "2021"
 description = "A simple macro that prints a warning if a function takes longer than expected"
@@ -19,7 +19,7 @@ proc-macro = true
 [dependencies]
 proc-macro2 = "1"
 quote = "1"
-syn = { version = "2", features = ["full", "clone-impls", "extra-traits"] }
+syn = { version = "2", default-features = false }
 
 [dev-dependencies]
 tokio = { version = "1", features = ["macros", "rt", "time"] }
