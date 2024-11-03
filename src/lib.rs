@@ -22,20 +22,14 @@ fn parse_time(expr: &Expr) -> Result<Duration> {
                     literal.base10_parse::<u64>()? * 60 * 60 * 24,
                 )),
                 "" => Ok(Duration::from_millis(literal.base10_parse::<u64>()?)),
-                suffix => {
-                    return Err(syn::Error::new(
-                        expr.span(),
-                        format!("Unexpected a numeric literal suffix {}", suffix),
-                    ))
-                }
+                suffix => Err(syn::Error::new(
+                    expr.span(),
+                    format!("Unexpected a numeric literal suffix {}", suffix),
+                )),
             },
-            _ => {
-                return Err(syn::Error::new(expr.span(), "Expected a numeric literal"));
-            }
+            _ => Err(syn::Error::new(expr.span(), "Expected a numeric literal")),
         },
-        _ => {
-            return Err(syn::Error::new(expr.span(), "Expected a numeric literal"));
-        }
+        _ => Err(syn::Error::new(expr.span(), "Expected a numeric literal")),
     }
 }
 
@@ -99,7 +93,7 @@ fn slow_function_warning_common(time: Duration, stmt: Stmt, function: ItemFn) ->
         vis: function.vis.clone(),
         sig: function.sig.clone(),
         block: Box::new(Block {
-            brace_token: function.block.brace_token.clone(),
+            brace_token: function.block.brace_token,
             stmts: vec![],
         }),
     };
