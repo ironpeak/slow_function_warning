@@ -1,0 +1,94 @@
+name: Main
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - ".github/dependabot.yml"
+      - ".gitignore"
+      - ".rustfmt.toml"
+      - "deny.toml"
+      - "LICENSE"
+      - "README.md"
+  pull_request:
+    paths-ignore:
+      - ".github/dependabot.yml"
+      - ".gitignore"
+      - ".rustfmt.toml"
+      - "deny.toml"
+      - "LICENSE"
+      - "README.md"
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  format:
+    name: Format
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone repo
+        uses: actions/checkout@v4
+
+      - name: Cache crates
+        uses: Swatinem/rust-cache@v2
+
+      - name: Install Taplo
+        run: cargo install --locked taplo-cli
+
+      - name: Format
+        run: |
+          cargo fmt --all --check
+          taplo fmt --check
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone repo
+        uses: actions/checkout@v4
+
+      - name: Instal stable toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache crates
+        uses: Swatinem/rust-cache@v2
+
+      - name: Clippy
+        run: cargo clippy --all-features --benches --tests -- -D warnings
+
+      - name: Rustdoc
+        run: cargo rustdoc --all-features -- -D warnings
+
+  doctest:
+    name: Doctest
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone repo
+        uses: actions/checkout@v4
+
+      - name: Instal stable toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache crates
+        uses: Swatinem/rust-cache@v2
+
+      - name: Test doc
+        run: cargo test --all-features --doc
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone repo
+        uses: actions/checkout@v4
+
+      - name: Instal stable toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache crates
+        uses: Swatinem/rust-cache@v2
+
+      - name: Test
+        run: cargo test --all-features
