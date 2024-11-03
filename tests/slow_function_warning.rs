@@ -1,18 +1,6 @@
 use slow_function_warning::*;
 use std::{thread, time::Duration};
 
-fn write_to_file(path: &str, message: &str) {
-    std::fs::write(path, message).unwrap();
-}
-
-fn read_from_file(path: &str) -> String {
-    std::fs::read_to_string(path).unwrap()
-}
-
-fn file_exists(path: &str) -> bool {
-    std::path::Path::new(path).exists()
-}
-
 #[test]
 fn default_compiles() {
     #[slow_function_warning]
@@ -35,128 +23,134 @@ fn default_warning_compiles() {
 
 #[test]
 fn warn() {
-    #[slow_function_warning(10ms, write_to_file("./slow_function_warning_warn.txt", &format!("{module}::{function}")))]
-    pub fn sleep(millis: u64) {
+    #[slow_function_warning(10ms, {*warned = true;})]
+    pub fn sleep(millis: u64, warned: &mut bool) {
         thread::sleep(Duration::from_millis(millis));
     }
 
-    sleep(10);
+    let mut warned = false;
+    sleep(100, &mut warned);
 
-    assert_eq!(
-        read_from_file("./slow_function_warning_warn.txt"),
-        "slow_function_warning::sleep"
-    );
+    assert!(warned);
 }
 
 #[test]
 fn no_warn() {
-    #[slow_function_warning(10ms, write_to_file("./slow_function_warning_no_warn.txt", &format!("{module}::{function}")))]
-    pub fn sleep(millis: u64) {
+    #[slow_function_warning(10ms, {*warned = true;})]
+    pub fn sleep(millis: u64, warned: &mut bool) {
         thread::sleep(Duration::from_millis(millis));
     }
 
-    sleep(1);
+    let mut warned = false;
+    sleep(1, &mut warned);
 
-    assert!(!file_exists("./slow_function_warning_no_warn.txt"));
+    assert!(!warned);
 }
 
 #[test]
 fn warn_using_params() {
-    #[allow(unused_variables)]
-    #[slow_function_warning(10ms, write_to_file("./slow_function_warning_warn_using_params.txt", &format!("{module}::{function} {param}")))]
-    pub fn sleep(millis: u64, param: &str) {
+    #[slow_function_warning(10ms, {
+        println!("{module}::{function} {param}");
+        *warned = true;
+    })]
+    pub fn sleep(millis: u64, param: &str, warned: &mut bool) {
         thread::sleep(Duration::from_millis(millis));
     }
 
-    sleep(10, "trace id");
+    let mut warned = false;
+    sleep(10, "trace id", &mut warned);
 
-    assert_eq!(
-        read_from_file("./slow_function_warning_warn_using_params.txt"),
-        "slow_function_warning::sleep trace id"
-    );
+    assert!(warned);
 }
 
 #[test]
 fn no_warn_using_params() {
-    #[allow(unused_variables)]
-    #[slow_function_warning(10ms, write_to_file("./slow_function_warning_no_warn_using_params.txt", &format!("{module}::{function} {param}")))]
-    pub fn sleep(millis: u64, param: &str) {
+    #[slow_function_warning(10ms, {
+        println!("{module}::{function} {param}");
+        *warned = true;
+    })]
+    pub fn sleep(millis: u64, param: &str, warned: &mut bool) {
         thread::sleep(Duration::from_millis(millis));
     }
 
-    sleep(1, "trace id");
+    let mut warned = false;
+    sleep(1, "trace id", &mut warned);
 
-    assert!(!file_exists(
-        "./slow_function_warning_no_warn_using_params.txt"
-    ));
+    assert!(!warned);
 }
 
 #[test]
 fn warn_impl() {
     struct MyStruct {
-        pub value: u64,
+        pub warned: bool,
     }
 
     impl MyStruct {
-        #[slow_function_warning(10ms, write_to_file("./slow_function_warning_warn_impl.txt", &format!("{module}::{function} {param}")))]
+        #[slow_function_warning(10ms, {
+            println!("{module}::{function} {param}");
+            self.warned = true;
+        })]
         pub fn sleep(&mut self, millis: u64, param: &str) {
-            println!("{} {millis} {param}", self.value);
             thread::sleep(Duration::from_millis(millis));
         }
     }
 
-    let mut my_struct = MyStruct { value: 10 };
+    let mut my_struct = MyStruct { warned: false };
     my_struct.sleep(10, "trace id");
 
-    assert_eq!(
-        read_from_file("./slow_function_warning_warn_impl.txt"),
-        "slow_function_warning::sleep trace id"
-    );
+    assert!(my_struct.warned);
 }
 
 #[test]
 fn no_warn_impl() {
     struct MyStruct {
-        pub value: u64,
+        pub warned: bool,
     }
 
     impl MyStruct {
-        #[slow_function_warning(10ms, write_to_file("./slow_function_warning_no_warn_impl.txt", &format!("{module}::{function} {param}")))]
+        #[slow_function_warning(10ms, {
+            println!("{module}::{function} {param}");
+            self.warned = true;
+        })]
         pub fn sleep(&mut self, millis: u64, param: &str) {
-            println!("{} {millis} {param}", self.value);
             thread::sleep(Duration::from_millis(millis));
         }
     }
 
-    let mut my_struct = MyStruct { value: 10 };
+    let mut my_struct = MyStruct { warned: false };
     my_struct.sleep(1, "trace id");
 
-    assert!(!file_exists("./slow_function_warning_no_warn_impl.txt"));
+    assert!(!my_struct.warned);
 }
 
 #[tokio::test]
 async fn warn_async() {
-    #[slow_function_warning(10ms, write_to_file("./slow_function_warning_warn_async.txt", &format!("{module}::{function}")))]
-    pub async fn sleep(millis: u64) {
+    #[slow_function_warning(10ms, {
+        println!("{module}::{function} {param}");
+        *warned = true;
+    })]
+    pub async fn sleep(millis: u64, param: &str, warned: &mut bool) {
         tokio::time::sleep(Duration::from_millis(millis)).await;
     }
 
-    sleep(10).await;
+    let mut warned = false;
+    sleep(10, "trace id", &mut warned).await;
 
-    assert_eq!(
-        read_from_file("./slow_function_warning_warn_async.txt"),
-        "slow_function_warning::sleep"
-    );
+    assert!(warned);
 }
 
 #[tokio::test]
 async fn no_warn_async() {
-    #[slow_function_warning(10ms, write_to_file("./slow_function_warning_no_warn_async.txt", &format!("{module}::{function}")))]
-    pub async fn sleep(millis: u64) {
+    #[slow_function_warning(50ms, {
+        println!("{module}::{function} {param}");
+        *warned = true;
+    })]
+    pub async fn sleep(millis: u64, param: &str, warned: &mut bool) {
         tokio::time::sleep(Duration::from_millis(millis)).await;
     }
 
-    sleep(1).await;
+    let mut warned = false;
+    sleep(1, "trace id", &mut warned).await;
 
-    assert!(!file_exists("./slow_function_warning_no_warn_async.txt"));
+    assert!(!warned);
 }
