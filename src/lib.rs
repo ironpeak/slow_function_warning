@@ -144,7 +144,7 @@ fn slow_function_warning_common(time: Duration, stmt: Stmt, function: ItemFn) ->
     result.block = syn::parse(
         quote! {{
             #closure_decleration
-            let start = std::time::Instant::now();
+            let start = instant::Instant::now();
             #closure_call
             if start.elapsed().as_nanos() > #nano_seconds {
                 let module = module_path!();

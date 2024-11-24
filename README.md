@@ -2,15 +2,9 @@
 
 This crate provides a procedural macro to inject timers into functions and print a warning if it takes longer than expected. It can be particularly useful for debugging performance issues during development.
 
-# Conditional Compilation
+This is not meant to be a benchmarking tool, but rather a way to detect potential performance issues in your code.
 
-Timing functions can affect the performance of your application, so it's important to use conditional compilation to ensure that the timing code is only included when necessary.
-
-~~~rust
-debug_slow_function_warning // in debug mode
-release_slow_function_warning // in release mode
-slow_function_warning // in both debug and release mode
-~~~
+For example my use case was for developing a game in [Bevy](https://bevyengine.org/) and I've added this to all my systems to detect if any game system function takes longer than a 1ms.
 
 # Usage
 
@@ -26,7 +20,43 @@ slow_function_warning = "0.2.0"
 ## Basic Example
 
 ```rust
-#[debug_slow_function_warning(1000ms)] // Warn if the function takes longer than 1000 milliseconds
+#[slow_function_warning(1000ms)] // Warn if the function takes longer than 1000 milliseconds
+fn example_function() {
+    // Function implementation
+}
+```
+
+## Debug Only Example
+
+```rust
+#[cfg_attr(debug_assertions, slow_function_warning(1000ms))]
+fn example_function() {
+    // Function implementation
+}
+```
+
+Or using the convenience proc macro:
+
+```rust
+#[debug_slow_function_warning(1000ms)]
+fn example_function() {
+    // Function implementation
+}
+```
+
+## Release Only Example
+
+```rust
+#[cfg_attr(not(debug_assertions), slow_function_warning(1000ms))]
+fn example_function() {
+    // Function implementation
+}
+```
+
+Or using the convenience proc macro:
+
+```rust
+#[release_slow_function_warning(1000ms)]
 fn example_function() {
     // Function implementation
 }
@@ -94,7 +124,7 @@ fn example_function() {
     let closure = || {
         let x = 10;
     };
-    let start = std::time::Instant::now();
+    let start = instant::Instant::now();
     let result = closure();
     if start.elapsed().as_nanos() > 1000000 {
         let module = "module name";

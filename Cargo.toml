@@ -17,6 +17,7 @@ default = []
 proc-macro = true
 
 [dependencies]
+instant = "0.1"
 proc-macro2 = "1"
 quote = "1"
 syn = { version = "2", features = ["full"] }
