@@ -15,6 +15,10 @@ Add the following to your `Cargo.toml`:
 ```toml
 [dependencies]
 slow_function_warning = "0.2.0"
+
+# For wasm targets
+[target.'cfg(target_family = "wasm")'.dependencies]
+web-time = "1"
 ```
 
 ## Basic Example
@@ -124,7 +128,10 @@ fn example_function() {
     let closure = || {
         let x = 10;
     };
-    let start = instant::Instant::now();
+    #[cfg(not(target_family = "wasm"))]
+    let start = std::time::Instant::now();
+    #[cfg(target_family = "wasm")]
+    let start = web_time::Instant::now();
     let result = closure();
     if start.elapsed().as_nanos() > 1000000 {
         let module = "module name";

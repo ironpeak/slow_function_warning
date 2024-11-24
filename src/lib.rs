@@ -144,7 +144,10 @@ fn slow_function_warning_common(time: Duration, stmt: Stmt, function: ItemFn) ->
     result.block = syn::parse(
         quote! {{
             #closure_decleration
-            let start = instant::Instant::now();
+            #[cfg(not(target_family = "wasm"))]
+            let start = std::time::Instant::now();
+            #[cfg(target_family = "wasm")]
+            let start = web_time::Instant::now();
             #closure_call
             if start.elapsed().as_nanos() > #nano_seconds {
                 let module = module_path!();

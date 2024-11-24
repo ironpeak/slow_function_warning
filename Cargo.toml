@@ -1,6 +1,6 @@
 [package]
 name = "slow_function_warning"
-version = "0.3.0-rc.0"
+version = "0.3.0-rc.1"
 authors = ["Hrafn Orri Hrafnkelsson <hrafn@vidfjord.is>"]
 edition = "2021"
 description = "A simple macro that prints a warning if a function takes longer than expected"
@@ -17,10 +17,12 @@ default = []
 proc-macro = true
 
 [dependencies]
-instant = "0.1"
 proc-macro2 = "1"
 quote = "1"
 syn = { version = "2", features = ["full"] }
+
+[target.'cfg(target_family = "wasm")'.dependencies]
+web-time = "1"
 
 [dev-dependencies]
 tokio = { version = "1", features = ["macros", "rt", "time"] }
