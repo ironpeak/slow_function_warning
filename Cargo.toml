@@ -1,6 +1,6 @@
 [package]
 name = "slow_function_warning"
-version = "0.2.2"
+version = "0.3.0-rc.0"
 authors = ["Hrafn Orri Hrafnkelsson <hrafn@vidfjord.is>"]
 edition = "2021"
 description = "A simple macro that prints a warning if a function takes longer than expected"
