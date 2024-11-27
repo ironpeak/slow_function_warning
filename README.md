@@ -30,47 +30,17 @@ fn example_function() {
 }
 ```
 
-## Debug Only Example
+The warning is not on by default and is only recommended for debugging purposes. To enable it use the `slow_function_warning` feature.
 
-```rust
-#[cfg_attr(debug_assertions, slow_function_warning(1000ms))]
-fn example_function() {
-    // Function implementation
-}
-```
-
-Or using the convenience proc macro:
-
-```rust
-#[debug_slow_function_warning(1000ms)]
-fn example_function() {
-    // Function implementation
-}
-```
-
-## Release Only Example
-
-```rust
-#[cfg_attr(not(debug_assertions), slow_function_warning(1000ms))]
-fn example_function() {
-    // Function implementation
-}
-```
-
-Or using the convenience proc macro:
-
-```rust
-#[release_slow_function_warning(1000ms)]
-fn example_function() {
-    // Function implementation
-}
-```
+~~~bash
+cargo run --features slow_function_warning
+~~~
 
 ## Custom Message Example
 
 ```rust
 // Warn if the function takes longer than a second with a custom message
-#[debug_slow_function_warning(1s, println!("Function {function} took too long!"))]
+#[slow_function_warning(1s, println!("Function {function} took too long!"))]
 fn example_function() {
     // Function implementation
 }

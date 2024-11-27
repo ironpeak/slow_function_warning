@@ -34,23 +34,10 @@ fn parse_time(expr: &Expr) -> Result<Duration> {
 }
 
 #[proc_macro_attribute]
-pub fn debug_slow_function_warning(args: TokenStream, input: TokenStream) -> TokenStream {
-    if !cfg!(debug_assertions) {
-        return input;
-    }
-    slow_function_warning(args, input)
-}
-
-#[proc_macro_attribute]
-pub fn release_slow_function_warning(args: TokenStream, input: TokenStream) -> TokenStream {
-    if cfg!(debug_assertions) {
-        return input;
-    }
-    slow_function_warning(args, input)
-}
-
-#[proc_macro_attribute]
 pub fn slow_function_warning(args: TokenStream, input: TokenStream) -> TokenStream {
+    if !cfg!(feature = "slow_function_warning") {
+        return input;
+    }
     let args: Punctuated<Expr, Token![,]> = if !args.is_empty() {
         parse_macro_input!(args with Punctuated::<Expr, Token![,]>::parse_separated_nonempty)
             .into_iter()

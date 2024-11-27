@@ -12,6 +12,7 @@ license = "MIT"
 
 [features]
 default = []
+slow_function_warning = []
 
 [lib]
 proc-macro = true
