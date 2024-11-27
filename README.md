@@ -33,7 +33,7 @@ fn example_function() {
 The warning is not on by default and is only recommended for debugging purposes. To enable it use the `slow_function_warning` feature.
 
 ~~~bash
-cargo run --features slow_function_warning
+cargo run --features slow_function_warning/enabled
 ~~~
 
 ## Custom Message Example
