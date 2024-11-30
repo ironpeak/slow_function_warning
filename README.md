@@ -14,7 +14,7 @@ Add the following to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-slow_function_warning = "0.2.0"
+slow_function_warning = "0.4.0"
 
 # For wasm targets
 [target.'cfg(target_family = "wasm")'.dependencies]
