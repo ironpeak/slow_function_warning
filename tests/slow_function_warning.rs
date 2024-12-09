@@ -23,6 +23,7 @@ fn default_warning_compiles() {
 
 #[test]
 fn warn() {
+    #[allow(unused_variables)]
     #[slow_function_warning(10ms, {*warned = true;})]
     pub fn sleep(millis: u64, warned: &mut bool) {
         thread::sleep(Duration::from_millis(millis));
@@ -36,6 +37,7 @@ fn warn() {
 
 #[test]
 fn no_warn() {
+    #[allow(unused_variables)]
     #[slow_function_warning(10ms, {*warned = true;})]
     pub fn sleep(millis: u64, warned: &mut bool) {
         thread::sleep(Duration::from_millis(millis));
@@ -49,6 +51,7 @@ fn no_warn() {
 
 #[test]
 fn warn_using_params() {
+    #[allow(unused_variables)]
     #[slow_function_warning(10ms, {
         println!("{module}::{function} {param}");
         *warned = true;
@@ -65,6 +68,7 @@ fn warn_using_params() {
 
 #[test]
 fn no_warn_using_params() {
+    #[allow(unused_variables)]
     #[slow_function_warning(10ms, {
         println!("{module}::{function} {param}");
         *warned = true;
@@ -86,6 +90,7 @@ fn warn_impl() {
     }
 
     impl MyStruct {
+        #[allow(unused_variables)]
         #[slow_function_warning(10ms, {
             println!("{module}::{function} {param}");
             self.warned = true;
@@ -108,6 +113,7 @@ fn no_warn_impl() {
     }
 
     impl MyStruct {
+        #[allow(unused_variables)]
         #[slow_function_warning(10ms, {
             println!("{module}::{function} {param}");
             self.warned = true;
@@ -125,6 +131,7 @@ fn no_warn_impl() {
 
 #[tokio::test]
 async fn warn_async() {
+    #[allow(unused_variables)]
     #[slow_function_warning(10ms, {
         println!("{module}::{function} {param}");
         *warned = true;
@@ -141,6 +148,7 @@ async fn warn_async() {
 
 #[tokio::test]
 async fn no_warn_async() {
+    #[allow(unused_variables)]
     #[slow_function_warning(50ms, {
         println!("{module}::{function} {param}");
         *warned = true;
