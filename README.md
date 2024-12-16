@@ -13,8 +13,12 @@ For example my use case was for developing a game in [Bevy](https://bevyengine.o
 Add the following to your `Cargo.toml`:
 
 ```toml
+[features]
+slow_function_warning = ["dep:slow_function_warning"]
+
 [dependencies]
-slow_function_warning = "0.4.0"
+# Add as a feature to avoid affecting the LSP.
+slow_function_warning = { version = "0.5.0-rc.1", optional = true }
 
 # For wasm targets
 [target.'cfg(target_family = "wasm")'.dependencies]
@@ -24,7 +28,7 @@ web-time = "1"
 ## Basic Example
 
 ```rust
-#[slow_function_warning(1000ms)] // Warn if the function takes longer than 1000 milliseconds
+#[cfg_attr(feature = "slow_function_warning", slow_function_warning(1000ms))] // Warn if the function takes longer than 1000 milliseconds
 fn example_function() {
     // Function implementation
 }
@@ -40,7 +44,7 @@ cargo run --features slow_function_warning/enabled
 
 ```rust
 // Warn if the function takes longer than a second with a custom message
-#[slow_function_warning(1s, println!("Function {function} took too long!"))]
+#[cfg_attr(feature = "slow_function_warning", slow_function_warning(1ms, println!("Function {function} took too long!")))]
 fn example_function() {
     // Function implementation
 }
@@ -50,7 +54,7 @@ You can also use the function parameters in your message:
 
 ```rust
 // Warn if the function takes longer than a second with a custom message
-#[debug_slow_function_warning(1s, println!("Function {function} took {millis} for {} values!", values.len()))]
+#[cfg_attr(feature = "slow_function_warning", slow_function_warning(1s, println!("Function {function} took {millis} for {} values!", values.len())))]
 fn sort(values: &Vec<u32>) {
     // Function implementation
 }
@@ -85,7 +89,7 @@ This is a procedural macro that takes the content of a function and places it in
 
 ```rust
 // Warn if the function takes longer than a second with a custom message
-#[debug_slow_function_warning(1s, println!("Function {function} took too long!"))]
+#[cfg_attr(feature = "slow_function_warning", slow_function_warning(1s, println!("Function {function} took too long!")))]
 fn example_function() {
     let x = 10;
 }
@@ -113,7 +117,7 @@ fn example_function() {
         let millis = ms;
         let s = elapsed.as_secs();
         let secs = s;
-        println!("Function {function} took too long!")
+        println!("Warning: {module}::{function}: ran for {millis}ms")
     }
     result
 }
