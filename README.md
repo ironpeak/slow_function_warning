@@ -18,7 +18,7 @@ slow_function_warning = ["dep:slow_function_warning"]
 
 [dependencies]
 # Add as a feature to avoid affecting the LSP.
-slow_function_warning = { version = "0.5.0-rc.1", optional = true }
+slow_function_warning = { version = "0.5.0", optional = true }
 
 # For wasm targets
 [target.'cfg(target_family = "wasm")'.dependencies]
