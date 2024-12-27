@@ -37,7 +37,7 @@ fn example_function() {
 The warning is not on by default and is only recommended for debugging purposes. To enable it use the `slow_function_warning` feature.
 
 ~~~bash
-cargo run --features slow_function_warning/enabled
+cargo run --features slow_function_warning
 ~~~
 
 ## Custom Message Example
@@ -76,12 +76,41 @@ You can specify the duration using numeric literals followed by a suffix:
 * `module: String` - The name of the module
 * `function: String` - The name of the function
 * `elapsed: Duration` - The elapsed time
-* `nanos: u64` - The elapsed time in nanoseconds
-* `ns: u64` - The elapsed time in nanoseconds
-* `millis: u64` - The elapsed time in milliseconds
-* `ms: u64` - The elapsed time in milliseconds
-* `secs: u64` - The elapsed time in seconds
-* `s: u64` - The elapsed time in seconds
+* `elapsed_str: String` - The elapsed time using the limit unit specified (defaults to milliseconds)
+* `elapsed_ns: u64` - The elapsed time in nanoseconds
+* `elapsed_nanos: u64` - The elapsed time in nanoseconds
+* `elapsed_nanoseconds: u64` - The elapsed time in nanoseconds
+* `elapsed_ms: u64` - The elapsed time in milliseconds
+* `elapsed_millis: u64` - The elapsed time in milliseconds
+* `elapsed_milliseconds: u64` - The elapsed time in milliseconds
+* `elapsed_s: u64` - The elapsed time in seconds
+* `elapsed_secs: u64` - The elapsed time in seconds
+* `elapsed_seconds: u64` - The elapsed time in seconds
+* `elapsed_m: u64` - The elapsed time in minutes
+* `elapsed_min: u64` - The elapsed time in minutes
+* `elapsed_minutes: u64` - The elapsed time in minutes
+* `elapsed_h: u64` - The elapsed time in hours
+* `elapsed_hours: u64` - The elapsed time in hours
+* `elapsed_d: u64` - The elapsed time in days
+* `elapsed_days: u64` - The elapsed time in days
+* `limit: Duration` - The name of the module
+* `limit_str: String` - The limit time using the limit unit specified (defaults to milliseconds)
+* `limit_ns: u64` - The limit time in nanoseconds
+* `limit_nanos: u64` - The limit time in nanoseconds
+* `limit_nanoseconds: u64` - The limit time in nanoseconds
+* `limit_ms: u64` - The limit time in milliseconds
+* `limit_millis: u64` - The limit time in milliseconds
+* `limit_milliseconds: u64` - The limit time in milliseconds
+* `limit_s: u64` - The limit time in seconds
+* `limit_secs: u64` - The limit time in seconds
+* `limit_seconds: u64` - The limit time in seconds
+* `limit_m: u64` - The limit time in minutes
+* `limit_min: u64` - The limit time in minutes
+* `limit_minutes: u64` - The limit time in minutes
+* `limit_h: u64` - The limit time in hours
+* `limit_hours: u64` - The limit time in hours
+* `limit_d: u64` - The limit time in days
+* `limit_days: u64` - The limit time in days
 
 ## How it works
 
@@ -108,16 +137,48 @@ fn example_function() {
     let start = web_time::Instant::now();
     let result = closure();
     if start.elapsed().as_nanos() > 1000000 {
-        let module = "module name";
-        let function = "example_function";
+        let module = module_path!();
+        let function = #function_name;
+
         let elapsed = start.elapsed();
-        let ns = elapsed.as_nanos();
-        let nanos = ns;
-        let ms = elapsed.as_millis();
-        let millis = ms;
-        let s = elapsed.as_secs();
-        let secs = s;
-        println!("Warning: {module}::{function}: ran for {millis}ms")
+        let elapsed_str = #elapsed_str;
+        let elapsed_ns = elapsed.as_nanos();
+        let elapsed_nanos = elapsed_ns;
+        let elapsed_nanoseconds = elapsed_ns;
+        let elapsed_ms = elapsed.as_millis();
+        let elapsed_millis = elapsed_ms;
+        let elapsed_milliseconds = elapsed_ms;
+        let elapsed_s = elapsed.as_secs();
+        let elapsed_secs = elapsed_s;
+        let elapsed_seconds = elapsed_s;
+        let elapsed_m = elapsed.as_secs() / 60;
+        let elapsed_min = elapsed_m;
+        let elapsed_minutes = elapsed_m;
+        let elapsed_h = elapsed.as_secs() / 60 / 60;
+        let elapsed_hours = elapsed_h;
+        let elapsed_d = elapsed.as_secs() / 60 / 60 / 24;
+        let elapsed_days = elapsed_d;
+
+        let limit = Duration::from_nanos(#nano_seconds as u64);
+        let limit_str = #limit_str;
+        let limit_ns = limit.as_nanos();
+        let limit_nanos = limit_ns;
+        let limit_nanoseconds = limit_ns;
+        let limit_ms = limit.as_millis();
+        let limit_millis = limit_ms;
+        let limit_milliseconds = limit_ms;
+        let limit_s = limit.as_secs();
+        let limit_secs = limit_s;
+        let limit_seconds = limit_s;
+        let limit_m = limit.as_secs() / 60;
+        let limit_min = limit_m;
+        let limit_minutes = limit_m;
+        let limit_h = limit.as_secs() / 60 / 60;
+        let limit_hours = limit_h;
+        let limit_d = limit.as_secs() / 60 / 60 / 24;
+        let limit_days = limit_d;
+
+        println!("Warning: {module}::{function}: ran for {elapsed_str} (limit: {limit_str})")
     }
     result
 }

@@ -1,5 +1,6 @@
-use slow_function_warning::*;
 use std::{thread, time::Duration};
+
+use slow_function_warning::*;
 
 #[test]
 fn default_compiles() {
