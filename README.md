@@ -80,6 +80,9 @@ You can specify the duration using numeric literals followed by a suffix:
 * `elapsed_ns: u128` - The elapsed time in nanoseconds
 * `elapsed_nanos: u128` - The elapsed time in nanoseconds
 * `elapsed_nanoseconds: u128` - The elapsed time in nanoseconds
+* `elapsed_us: u128` - The elapsed time in microseconds
+* `elapsed_micros: u128` - The elapsed time in microseconds
+* `elapsed_microseconds: u128` - The elapsed time in microseconds
 * `elapsed_ms: u128` - The elapsed time in milliseconds
 * `elapsed_millis: u128` - The elapsed time in milliseconds
 * `elapsed_milliseconds: u128` - The elapsed time in milliseconds
@@ -98,6 +101,9 @@ You can specify the duration using numeric literals followed by a suffix:
 * `limit_ns: u128` - The limit time in nanoseconds
 * `limit_nanos: u128` - The limit time in nanoseconds
 * `limit_nanoseconds: u128` - The limit time in nanoseconds
+* `limit_us: u128` - The limit time in microseconds
+* `limit_micros: u128` - The limit time in microseconds
+* `limit_microseconds: u128` - The limit time in microseconds
 * `limit_ms: u128` - The limit time in milliseconds
 * `limit_millis: u128` - The limit time in milliseconds
 * `limit_milliseconds: u128` - The limit time in milliseconds
