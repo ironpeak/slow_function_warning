@@ -1,5 +1,6 @@
-use slow_function_warning::*;
 use std::{thread, time::Duration};
+
+use slow_function_warning::*;
 
 #[test]
 fn default_compiles() {
@@ -23,21 +24,19 @@ fn default_warning_compiles() {
 
 #[test]
 fn warn() {
-    #[allow(unused_variables)]
-    #[slow_function_warning(10ms, {*warned = true;})]
+    #[slow_function_warning(1ms, {*warned = true;})]
     pub fn sleep(millis: u64, warned: &mut bool) {
         thread::sleep(Duration::from_millis(millis));
     }
 
     let mut warned = false;
-    sleep(100, &mut warned);
+    sleep(2, &mut warned);
 
     assert!(warned);
 }
 
 #[test]
 fn no_warn() {
-    #[allow(unused_variables)]
     #[slow_function_warning(10ms, {*warned = true;})]
     pub fn sleep(millis: u64, warned: &mut bool) {
         thread::sleep(Duration::from_millis(millis));
@@ -51,8 +50,7 @@ fn no_warn() {
 
 #[test]
 fn warn_using_params() {
-    #[allow(unused_variables)]
-    #[slow_function_warning(10ms, {
+    #[slow_function_warning(1ms, {
         println!("{module}::{function} {param}");
         *warned = true;
     })]
@@ -61,14 +59,13 @@ fn warn_using_params() {
     }
 
     let mut warned = false;
-    sleep(10, "trace id", &mut warned);
+    sleep(2, "trace id", &mut warned);
 
     assert!(warned);
 }
 
 #[test]
 fn no_warn_using_params() {
-    #[allow(unused_variables)]
     #[slow_function_warning(10ms, {
         println!("{module}::{function} {param}");
         *warned = true;
@@ -90,8 +87,7 @@ fn warn_impl() {
     }
 
     impl MyStruct {
-        #[allow(unused_variables)]
-        #[slow_function_warning(10ms, {
+        #[slow_function_warning(1ms, {
             println!("{module}::{function} {param}");
             self.warned = true;
         })]
@@ -101,7 +97,7 @@ fn warn_impl() {
     }
 
     let mut my_struct = MyStruct { warned: false };
-    my_struct.sleep(10, "trace id");
+    my_struct.sleep(2, "trace id");
 
     assert!(my_struct.warned);
 }
@@ -113,7 +109,6 @@ fn no_warn_impl() {
     }
 
     impl MyStruct {
-        #[allow(unused_variables)]
         #[slow_function_warning(10ms, {
             println!("{module}::{function} {param}");
             self.warned = true;
@@ -131,8 +126,7 @@ fn no_warn_impl() {
 
 #[tokio::test]
 async fn warn_async() {
-    #[allow(unused_variables)]
-    #[slow_function_warning(10ms, {
+    #[slow_function_warning(1ms, {
         println!("{module}::{function} {param}");
         *warned = true;
     })]
@@ -141,14 +135,13 @@ async fn warn_async() {
     }
 
     let mut warned = false;
-    sleep(10, "trace id", &mut warned).await;
+    sleep(2, "trace id", &mut warned).await;
 
     assert!(warned);
 }
 
 #[tokio::test]
 async fn no_warn_async() {
-    #[allow(unused_variables)]
     #[slow_function_warning(50ms, {
         println!("{module}::{function} {param}");
         *warned = true;
