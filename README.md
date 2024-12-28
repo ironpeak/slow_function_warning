@@ -151,6 +151,9 @@ fn example_function() {
         let elapsed_ns = elapsed.as_nanos();
         let elapsed_nanos = elapsed_ns;
         let elapsed_nanoseconds = elapsed_ns;
+        let elapsed_us = elapsed.as_micros();
+        let elapsed_micros = elapsed_us;
+        let elapsed_microseconds = elapsed_us;
         let elapsed_ms = elapsed.as_millis();
         let elapsed_millis = elapsed_ms;
         let elapsed_milliseconds = elapsed_ms;
@@ -170,6 +173,9 @@ fn example_function() {
         let limit_ns = limit.as_nanos();
         let limit_nanos = limit_ns;
         let limit_nanoseconds = limit_ns;
+        let limit_us = limit.as_micros();
+        let limit_micros = limit_us;
+        let limit_microseconds = limit_us;
         let limit_ms = limit.as_millis();
         let limit_millis = limit_ms;
         let limit_milliseconds = limit_ms;
