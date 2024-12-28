@@ -30,7 +30,7 @@ fn function() {
 
 #[test]
 fn elapsed() {
-    #[slow_function_warning(1ms, {*duration = elapsed.clone();})]
+    #[slow_function_warning(1ms, {*duration = elapsed;})]
     pub fn sleep(millis: u64, duration: &mut Duration) {
         thread::sleep(Duration::from_millis(millis));
     }
@@ -303,7 +303,7 @@ fn elapsed_days() {
 
 #[test]
 fn limit() {
-    #[slow_function_warning(1ms, {*duration = limit.clone();})]
+    #[slow_function_warning(1ms, {*duration = limit;})]
     pub fn sleep(millis: u64, duration: &mut Duration) {
         thread::sleep(Duration::from_millis(millis));
     }
