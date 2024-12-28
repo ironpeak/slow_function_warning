@@ -77,12 +77,12 @@ You can specify the duration using numeric literals followed by a suffix:
 * `function: String` - The name of the function
 * `elapsed: Duration` - The elapsed time
 * `elapsed_str: String` - The elapsed time using the limit unit specified (defaults to milliseconds)
-* `elapsed_ns: u64` - The elapsed time in nanoseconds
-* `elapsed_nanos: u64` - The elapsed time in nanoseconds
-* `elapsed_nanoseconds: u64` - The elapsed time in nanoseconds
-* `elapsed_ms: u64` - The elapsed time in milliseconds
-* `elapsed_millis: u64` - The elapsed time in milliseconds
-* `elapsed_milliseconds: u64` - The elapsed time in milliseconds
+* `elapsed_ns: u128` - The elapsed time in nanoseconds
+* `elapsed_nanos: u128` - The elapsed time in nanoseconds
+* `elapsed_nanoseconds: u128` - The elapsed time in nanoseconds
+* `elapsed_ms: u128` - The elapsed time in milliseconds
+* `elapsed_millis: u128` - The elapsed time in milliseconds
+* `elapsed_milliseconds: u128` - The elapsed time in milliseconds
 * `elapsed_s: u64` - The elapsed time in seconds
 * `elapsed_secs: u64` - The elapsed time in seconds
 * `elapsed_seconds: u64` - The elapsed time in seconds
@@ -95,12 +95,12 @@ You can specify the duration using numeric literals followed by a suffix:
 * `elapsed_days: u64` - The elapsed time in days
 * `limit: Duration` - The name of the module
 * `limit_str: String` - The limit time using the limit unit specified (defaults to milliseconds)
-* `limit_ns: u64` - The limit time in nanoseconds
-* `limit_nanos: u64` - The limit time in nanoseconds
-* `limit_nanoseconds: u64` - The limit time in nanoseconds
-* `limit_ms: u64` - The limit time in milliseconds
-* `limit_millis: u64` - The limit time in milliseconds
-* `limit_milliseconds: u64` - The limit time in milliseconds
+* `limit_ns: u128` - The limit time in nanoseconds
+* `limit_nanos: u128` - The limit time in nanoseconds
+* `limit_nanoseconds: u128` - The limit time in nanoseconds
+* `limit_ms: u128` - The limit time in milliseconds
+* `limit_millis: u128` - The limit time in milliseconds
+* `limit_milliseconds: u128` - The limit time in milliseconds
 * `limit_s: u64` - The limit time in seconds
 * `limit_secs: u64` - The limit time in seconds
 * `limit_seconds: u64` - The limit time in seconds

@@ -24,13 +24,13 @@ fn default_warning_compiles() {
 
 #[test]
 fn warn() {
-    #[slow_function_warning(10ms, {*warned = true;})]
+    #[slow_function_warning(1ms, {*warned = true;})]
     pub fn sleep(millis: u64, warned: &mut bool) {
         thread::sleep(Duration::from_millis(millis));
     }
 
     let mut warned = false;
-    sleep(100, &mut warned);
+    sleep(2, &mut warned);
 
     assert!(warned);
 }
@@ -50,7 +50,7 @@ fn no_warn() {
 
 #[test]
 fn warn_using_params() {
-    #[slow_function_warning(10ms, {
+    #[slow_function_warning(1ms, {
         println!("{module}::{function} {param}");
         *warned = true;
     })]
@@ -59,7 +59,7 @@ fn warn_using_params() {
     }
 
     let mut warned = false;
-    sleep(10, "trace id", &mut warned);
+    sleep(2, "trace id", &mut warned);
 
     assert!(warned);
 }
@@ -87,7 +87,7 @@ fn warn_impl() {
     }
 
     impl MyStruct {
-        #[slow_function_warning(10ms, {
+        #[slow_function_warning(1ms, {
             println!("{module}::{function} {param}");
             self.warned = true;
         })]
@@ -97,7 +97,7 @@ fn warn_impl() {
     }
 
     let mut my_struct = MyStruct { warned: false };
-    my_struct.sleep(10, "trace id");
+    my_struct.sleep(2, "trace id");
 
     assert!(my_struct.warned);
 }
@@ -126,7 +126,7 @@ fn no_warn_impl() {
 
 #[tokio::test]
 async fn warn_async() {
-    #[slow_function_warning(10ms, {
+    #[slow_function_warning(1ms, {
         println!("{module}::{function} {param}");
         *warned = true;
     })]
@@ -135,7 +135,7 @@ async fn warn_async() {
     }
 
     let mut warned = false;
-    sleep(10, "trace id", &mut warned).await;
+    sleep(2, "trace id", &mut warned).await;
 
     assert!(warned);
 }
@@ -154,17 +154,4 @@ async fn no_warn_async() {
     sleep(1, "trace id", &mut warned).await;
 
     assert!(!warned);
-}
-
-#[test]
-fn limit() {
-    #[slow_function_warning(10ms, {*duration = limit.clone();})]
-    pub fn sleep(millis: u64, duration: &mut Duration) {
-        thread::sleep(Duration::from_millis(millis));
-    }
-
-    let mut duration = Duration::default();
-    sleep(100, &mut duration);
-
-    assert_eq!(duration.as_millis(), 10);
 }

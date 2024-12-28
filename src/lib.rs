@@ -9,6 +9,7 @@ use syn::{parse_macro_input, punctuated::Punctuated, spanned::Spanned, token::Se
 
 enum TimeUnit {
     Nanoseconds,
+    Microseconds,
     Milliseconds,
     Seconds,
     Minutes,
@@ -20,6 +21,7 @@ impl TimeUnit {
     fn to_duration(&self, amount: u64) -> Duration {
         match self {
             TimeUnit::Nanoseconds => Duration::from_nanos(amount),
+            TimeUnit::Microseconds => Duration::from_micros(amount),
             TimeUnit::Milliseconds => Duration::from_millis(amount),
             TimeUnit::Seconds => Duration::from_secs(amount),
             TimeUnit::Minutes => Duration::from_secs(amount * 60),
@@ -36,6 +38,7 @@ fn parse_time(expr: &Expr) -> Result<(u64, TimeUnit)> {
                 let amount = literal.base10_parse::<u64>()?;
                 let unit = match literal.suffix() {
                     "ns" => TimeUnit::Nanoseconds,
+                    "us" | "μs" => TimeUnit::Microseconds,
                     "ms" => TimeUnit::Milliseconds,
                     "s" => TimeUnit::Seconds,
                     "m" => TimeUnit::Minutes,
@@ -154,6 +157,9 @@ pub fn slow_function_warning(args: TokenStream, input: TokenStream) -> TokenStre
         TimeUnit::Nanoseconds => quote! {
             format!("{}ns", elapsed.as_nanos())
         },
+        TimeUnit::Microseconds => quote! {
+            format!("{}μs", elapsed.as_micros())
+        },
         TimeUnit::Milliseconds => quote! {
             format!("{}ms", elapsed.as_millis())
         },
@@ -174,6 +180,9 @@ pub fn slow_function_warning(args: TokenStream, input: TokenStream) -> TokenStre
     let limit_str = match unit {
         TimeUnit::Nanoseconds => quote! {
             format!("{}ns", limit.as_nanos())
+        },
+        TimeUnit::Microseconds => quote! {
+            format!("{}μs", limit.as_micros())
         },
         TimeUnit::Milliseconds => quote! {
             format!("{}ms", limit.as_millis())
@@ -209,6 +218,9 @@ pub fn slow_function_warning(args: TokenStream, input: TokenStream) -> TokenStre
                 let elapsed_ns = elapsed.as_nanos();
                 let elapsed_nanos = elapsed_ns;
                 let elapsed_nanoseconds = elapsed_ns;
+                let elapsed_us = elapsed.as_micros();
+                let elapsed_micros = elapsed_us;
+                let elapsed_microseconds = elapsed_us;
                 let elapsed_ms = elapsed.as_millis();
                 let elapsed_millis = elapsed_ms;
                 let elapsed_milliseconds = elapsed_ms;
@@ -228,6 +240,9 @@ pub fn slow_function_warning(args: TokenStream, input: TokenStream) -> TokenStre
                 let limit_ns = limit.as_nanos();
                 let limit_nanos = limit_ns;
                 let limit_nanoseconds = limit_ns;
+                let limit_us = limit.as_micros();
+                let limit_micros = limit_us;
+                let limit_microseconds = limit_us;
                 let limit_ms = limit.as_millis();
                 let limit_millis = limit_ms;
                 let limit_milliseconds = limit_ms;
