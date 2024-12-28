@@ -82,7 +82,7 @@ pub fn slow_function_warning(args: TokenStream, input: TokenStream) -> TokenStre
     } else {
         syn::parse(
             quote! {
-                println!("Warning: {module}::{function}: ran for {millis}ms");
+                println!("Warning: {module}::{function}: ran for {elapsed_str} (limit: {limit_str})");
             }
             .into(),
         )
