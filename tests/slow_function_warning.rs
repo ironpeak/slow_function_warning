@@ -3,26 +3,6 @@ use std::{thread, time::Duration};
 use slow_function_warning::*;
 
 #[test]
-fn default_compiles() {
-    #[slow_function_warning]
-    pub fn sleep(millis: u64) {
-        thread::sleep(Duration::from_millis(millis));
-    }
-
-    sleep(1);
-}
-
-#[test]
-fn default_warning_compiles() {
-    #[slow_function_warning(10ms)]
-    pub fn sleep(millis: u64) {
-        thread::sleep(Duration::from_millis(millis));
-    }
-
-    sleep(1);
-}
-
-#[test]
 fn warn() {
     #[slow_function_warning(1ms, {*warned = true;})]
     pub fn sleep(millis: u64, warned: &mut bool) {

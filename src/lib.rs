@@ -235,7 +235,7 @@ pub fn slow_function_warning(args: TokenStream, input: TokenStream) -> TokenStre
                 let elapsed_d = elapsed.as_secs() / 60 / 60 / 24;
                 let elapsed_days = elapsed_d;
 
-                let limit = Duration::from_nanos(#nano_seconds as u64);
+                let limit = std::time::Duration::from_nanos(#nano_seconds as u64);
                 let limit_str = #limit_str;
                 let limit_ns = limit.as_nanos();
                 let limit_nanos = limit_ns;
